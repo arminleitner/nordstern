@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nordstern KI — KI als Bauteil jeder Plattform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ Token-System: Nachthimmel über dem Leitstand ============ */
+:root{
+  --abyss:#070E1A;        /* Seiten-Hintergrund */
+  --depth:#0C1A28;        /* Panel-Hintergrund */
+  --panel:#122334;        /* Karten */
+  --panel-2:#0F1E2E;
+  --line:#20374C;         /* Hairlines */
+  --ink:#EAF3F7;          /* Primärtext */
+  --dim:#9EB4C3;          /* Sekundärtext */
+  --faint:#5F7686;
+  --bio:#4FD8D2;          /* läuft */
+  --bio-soft:rgba(79,216,210,.14);
+  --amber:#F0B450;        
+  --amber-soft:rgba(240,180,80,.12);
+  --plan:#AE8FF2;         
+  --plan-soft:rgba(174,143,242,.12);
+  --gold:#FFE3A1;         /* Nordstern */
+  --gold-soft:rgba(255,227,161,.12);
+  --coral:#F0785E;        /* Entscheidungen */
+  --coral-soft:rgba(240,120,94,.12);
+  --disp:"Bricolage Grotesque","Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+/* Die Seite ist bewusst dunkel – in beiden Viewer-Themes gleich. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--abyss:#070E1A;--depth:#0C1A28;--panel:#122334;--panel-2:#0F1E2E;--line:#20374C;--ink:#EAF3F7;--dim:#9EB4C3;--faint:#5F7686}
+}
+:root[data-theme="dark"]{--abyss:#070E1A;--depth:#0C1A28;--panel:#122334;--panel-2:#0F1E2E;--line:#20374C;--ink:#EAF3F7;--dim:#9EB4C3;--faint:#5F7686}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--abyss)}
+body{
+  background:var(--abyss);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+a{color:var(--bio)}
+a:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+::selection{background:var(--bio);color:var(--abyss)}
+img,svg{max-width:100%}
+
+/* ============ Kopf ============ */
+header.site{padding:44px 0 24px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--bio);
+}
+h1{
+  font-family:var(--disp);font-weight:800;
+  font-size:clamp(2.6rem,6vw,4.4rem);
+  letter-spacing:-.018em;line-height:1;margin:.3em 0 .25em;
+}
+h1 .thin{display:block;color:var(--dim);font-weight:600;font-size:.46em;letter-spacing:-.005em;line-height:1.2;margin-top:.35em;max-width:30em}
+.lede{max-width:66ch;color:var(--dim);font-size:1.06rem}
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:18px;
+  font-family:var(--mono);font-size:11.5px;color:var(--faint);
+}
+.meta b{color:var(--dim);font-weight:500}
+
+/* Stand-heute-Band */
+.delta{margin-top:26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.delta .d{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--bio);border-radius:10px;padding:12px 14px}
+.delta .d.work{border-left-color:var(--amber)}
+.delta .d.plan{border-left-color:var(--plan)}
+.delta .d.goal{border-left-color:var(--gold)}
+.delta .dd{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+.delta .dt{font-weight:600;font-size:13.5px;margin:4px 0 2px}
+.delta .dx{font-size:12.5px;color:var(--dim)}
+
+/* Status-Legende */
+.legend{
+  display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;
+  padding:14px 14px 12px;border-top:1px solid var(--line);margin-top:6px;
+  font-family:var(--mono);font-size:11px;color:var(--dim);
+}
+.legend .dot{display:inline-block;vertical-align:middle;margin-right:8px;width:10px;height:10px;border-radius:50%}
+.legend .dot.live{background:var(--bio);box-shadow:0 0 8px rgba(79,216,210,.7)}
+.legend .dot.work{background:var(--amber)}
+.legend .dot.plan{background:transparent;border:2px solid var(--plan)}
+.legend .dot.goal{background:transparent;border:1.5px solid var(--gold);box-shadow:0 0 0 3px rgba(255,227,161,.18)}
+.legend .dot.find{background:var(--coral)}
+.legend .hint{margin-left:auto;color:var(--faint)}
+
+/* ============ Sektionen ============ */
+section{padding:54px 0 8px}
+.sec-head{margin-bottom:22px}
+.sec-head .eyebrow{color:var(--amber)}
+h2{
+  font-family:var(--disp);font-weight:700;font-size:1.72rem;
+  letter-spacing:-.01em;margin-top:.3em;
+}
+.sec-head p{color:var(--dim);max-width:76ch;margin-top:.45em}
+.sec-head p b{color:var(--ink);font-weight:600}
+
+/* ============ Leitplanken ============ */
+.rails{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rail{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;border-top:3px solid var(--gold)}
+.rail h3{font-family:var(--disp);font-weight:700;font-size:1.08rem;letter-spacing:-.005em;margin-bottom:6px}
+.rail p{font-size:13.5px;color:var(--dim)}
+.rail p b{color:var(--ink);font-weight:600}
+
+/* ============ Sternkarte ============ */
+.chart-panel{
+  position:relative;background:radial-gradient(ellipse at 50% 8%,#10233A 0%,var(--depth) 45%,#0A1522 100%);
+  border:1px solid var(--line);border-radius:18px;
+  padding:10px 10px 4px;margin-top:26px;overflow:hidden;
+}
+.chart-panel .stamp{
+  position:absolute;top:16px;left:20px;z-index:2;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  color:var(--faint);text-transform:uppercase;
+}
+.map-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg.map{display:block;width:100%;height:auto}
+.swipe{display:none;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;padding:6px 14px 2px}
+
+.bg-star{fill:#C9DCE8}
+.cname{font-family:var(--disp);font-weight:700;font-size:20px;fill:var(--faint);letter-spacing:.01em}
+.lbl{font-family:var(--body);font-weight:500;font-size:15px;fill:var(--ink)}
+.lbl.soft{fill:var(--dim)}
+.cl{fill:none;stroke:#2B4358;stroke-width:1.5}
+.hubl{fill:none;stroke:var(--bio);stroke-width:1.5;stroke-dasharray:4 7;opacity:.4}
+.course{fill:none;stroke:var(--gold);stroke-width:1.6;stroke-dasharray:2 8;opacity:.55}
+.st circle.core{transition:r .15s}
+.st.live circle.core{fill:var(--bio)}
+.st.live circle.halo{fill:var(--bio);opacity:.28}
+.st.work circle.core{fill:var(--amber)}
+.st.work circle.halo{fill:var(--amber);opacity:.26}
+.st.plan circle.core{fill:#0E1B2B;stroke:var(--plan);stroke-width:2}
+.st.plan circle.halo{fill:var(--plan);opacity:.12}
+.st.goal circle.core{fill:#0E1B2B;stroke:var(--gold);stroke-width:1.6}
+.st.goal circle.ring{fill:none;stroke:var(--gold);stroke-width:1;stroke-dasharray:2 3;opacity:.6}
+.st.goal circle.halo{fill:var(--gold);opacity:.1}
+a.st:hover circle.core,a.st:focus-visible circle.core{r:9}
+a.st:focus-visible{outline:none}
+.hub circle.hub-fill{fill:url(#hubGrad);stroke:var(--bio);stroke-width:1.6}
+.hub-t{font-family:var(--disp);font-weight:800;font-size:19px;fill:var(--ink);letter-spacing:.08em}
+.hub-s{font-family:var(--mono);font-size:10.5px;fill:var(--faint);letter-spacing:.06em}
+.polaris{fill:var(--gold)}
+.polaris-glow{fill:var(--gold);opacity:.22}
+.pol-t{font-family:var(--disp);font-weight:800;font-size:23px;fill:var(--gold);letter-spacing:.02em}
+.pol-s{font-family:var(--body);font-weight:500;font-size:13px;fill:var(--dim)}
+@keyframes breathe{0%,100%{opacity:.18;transform:scale(1)}50%{opacity:.34;transform:scale(1.18)}}
+.polaris-glow{transform-box:fill-box;transform-origin:center;animation:breathe 6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.polaris-glow{animation:none}}
+
+/* ============ Stern-Karten ============ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;
+}
+.card.live{border-color:rgba(79,216,210,.45)}
+.card.goal{border-color:rgba(255,227,161,.35)}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card .name{font-family:var(--disp);font-weight:700;font-size:1.05rem;letter-spacing:-.005em;line-height:1.2}
+.pill{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;font-weight:600;
+  padding:3px 9px;border-radius:99px;white-space:nowrap;text-transform:uppercase;flex-shrink:0;margin-top:2px;
+}
+.pill.live{color:var(--bio);background:var(--bio-soft);border:1px solid rgba(79,216,210,.4)}
+.pill.work{color:var(--amber);background:var(--amber-soft);border:1px solid rgba(240,180,80,.4)}
+.pill.plan{color:var(--plan);background:var(--plan-soft);border:1px solid rgba(174,143,242,.4)}
+.pill.goal{color:var(--gold);background:var(--gold-soft);border:1px solid rgba(255,227,161,.4)}
+.pill.find{color:var(--coral);background:var(--coral-soft);border:1px solid rgba(240,120,94,.4)}
+.card .route{font-size:12.5px;color:var(--dim);font-weight:500;font-family:var(--mono);line-height:1.5}
+.card .route b{color:var(--ink);font-weight:600}
+.card p{font-size:13.5px;color:var(--dim)}
+.card p b{color:var(--ink);font-weight:600}
+.card .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--plan);text-transform:uppercase;margin-top:auto;padding-top:4px}
+.card .tag.human{color:var(--gold)}
+.card .tag.base{color:var(--faint)}
+
+/* ============ Tabelle Datenflüsse ============ */
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel-2)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:500;background:var(--depth)}
+td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+td{color:var(--dim)}
+td b{color:var(--ink);font-weight:600}
+tr:last-child td{border-bottom:none}
+
+/* ============ (frei) ============ */
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.stage{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px;position:relative}
+.stage:nth-child(1){border-top:3px solid var(--amber)}
+.stage:nth-child(2){border-top:3px solid var(--plan)}
+.stage:nth-child(3){border-top:3px solid var(--gold)}
+.stage .when{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.stage h3{font-family:var(--disp);font-weight:700;font-size:1.15rem;margin:4px 0 10px;letter-spacing:-.005em}
+.stage ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.stage li{font-size:13.5px;color:var(--dim);padding-left:18px;position:relative}
+.stage li::before{content:"";position:absolute;left:0;top:.52em;width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.stage li.live::before{background:var(--bio)}
+.stage li.work::before{background:var(--amber)}
+.stage li.plan::before{background:transparent;border:2px solid var(--plan);box-sizing:border-box}
+.stage li.goal::before{background:transparent;border:1.5px solid var(--gold);box-sizing:border-box}
+.stage li b{color:var(--ink);font-weight:600}
+
+/* ============ Entscheidungen ============ */
+.decisions{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;counter-reset:dec}
+.dec{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--coral);border-radius:14px;padding:16px 18px 14px;counter-increment:dec}
+.dec h3{font-family:var(--disp);font-weight:700;font-size:1.05rem;letter-spacing:-.005em;margin-bottom:6px;display:flex;gap:10px;align-items:baseline}
+.dec h3::before{content:counter(dec);font-family:var(--mono);font-size:12px;color:var(--coral);font-weight:600}
+.dec p{font-size:13.5px;color:var(--dim)}
+.dec p b{color:var(--ink);font-weight:600}
+
+/* ============ Fuß ============ */
+footer.site{margin-top:60px;padding:24px 0 48px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--faint);line-height:1.7}
+footer.site b{color:var(--dim);font-weight:500}
+
+/* ============ Nordstern-Tafel (KPI-Schema) ============ */
+a.polaris-link{cursor:pointer}
+a.polaris-link:hover .pol-t,a.polaris-link:focus-visible .pol-t{text-decoration:underline;text-underline-offset:4px}
+a.polaris-link:focus-visible{outline:none}
+.pol-k{font-family:var(--mono);font-size:11px;fill:var(--gold);letter-spacing:.06em;opacity:.9}
+a.polaris-link:hover .pol-k,a.polaris-link:focus-visible .pol-k{text-decoration:underline;text-underline-offset:3px}
+.tafel{
+  background:radial-gradient(ellipse at 50% 0%,#17273B 0%,var(--depth) 50%,#0A1522 100%);
+  border:1px solid rgba(255,227,161,.38);border-radius:18px;padding:30px 30px 24px;position:relative;overflow:hidden;
+}
+.tafel .eyebrow{color:var(--gold)}
+.tafel h2{font-size:clamp(1.9rem,4vw,2.9rem);line-height:1.05;letter-spacing:-.02em;margin-top:.25em}
+.tafel h2 .thin{display:block;color:var(--dim);font-weight:600;font-size:.6em;margin-top:.25em}
+.tafel .lede{margin-top:12px;max-width:70ch}
+.lever{margin-top:24px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px 12px 6px}
+svg.lever-svg{display:block;width:100%;height:auto}
+.ax{stroke:#2B4358;stroke-width:1.5;fill:none}
+.axl{font-family:var(--mono);font-size:11px;fill:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+.ln-vorg{fill:none;stroke:var(--bio);stroke-width:3.2;stroke-linecap:round}
+.ln-ohne{fill:none;stroke:var(--coral);stroke-width:2.2;stroke-dasharray:7 7;stroke-linecap:round}
+.ln-mit{fill:none;stroke:var(--gold);stroke-width:3.2;stroke-linecap:round}
+.gap{fill:var(--gold);opacity:.11}
+.ll{font-family:var(--body);font-weight:600;font-size:14px;fill:var(--ink)}
+.ll.vorg{fill:var(--bio)}.ll.ohne{fill:var(--coral)}.ll.mit{fill:var(--gold)}
+.gapl{font-family:var(--disp);font-weight:700;font-size:17px;fill:var(--gold)}
+.gaps{font-family:var(--body);font-size:12.5px;fill:var(--dim)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+.kpi{background:var(--panel-2);border:1px solid var(--line);border-top:3px solid var(--bio);border-radius:14px;padding:18px 18px 14px}
+.kpi.same{border-top-color:var(--gold)}
+.kpi .dd{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+.kpi h3{font-family:var(--disp);font-weight:800;font-size:1.6rem;letter-spacing:-.015em;line-height:1.05;margin:4px 0 2px}
+.kpi .how{font-size:13px;color:var(--dim);margin-bottom:10px}
+.kpi ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.kpi li{font-size:13.5px;color:var(--ink);padding-left:22px;position:relative;line-height:1.4}
+.kpi li::before{position:absolute;left:0;top:0;font-family:var(--mono);font-weight:600;color:var(--bio)}
+.kpi li.up::before{content:"↑"}
+.kpi li.down::before{content:"↓"}
+.kpi li.zero::before{content:"→"}
+.kpi li.flat::before{content:"="; color:var(--gold)}
+.kpi li small{display:block;color:var(--dim);font-size:12px}
+.formel{margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:14px 16px}
+.formel .f{font-family:var(--mono);font-size:13px;color:var(--ink);background:var(--depth);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.formel .op{font-family:var(--disp);font-weight:800;font-size:1.2rem;color:var(--gold)}
+.formel .f.res{color:var(--gold);border-color:rgba(255,227,161,.4)}
+.formel .note{flex-basis:100%;font-size:12.5px;color:var(--dim)}
+.formel .note b{color:var(--ink);font-weight:600}
+
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  header.site{padding:30px 0 20px}
+  section{padding:40px 0 6px}
+  svg.map{min-width:920px}
+  .swipe{display:block}
+  .legend .hint{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="eyebrow">IT &amp; Organisation · KI-Zielbild</div>
+    <h1>Nordstern KI<span class="thin">KI als Bauteil von CRM, Servicedesk, Projektplattform, ERP, Vertragsarchiv und Datenplattform</span></h1>
+    <p class="lede">KI ist bei uns kein Chatfenster, sondern ein Bauteil in den Plattformen, die wir ohnehin betreiben. Agenten recherchieren im CRM, antworten im Servicedesk, lesen Belege für das ERP, legen Verträge in SharePoint ab und machen aus Besprechungen Arbeitspakete. Ein Hub steuert alle – nach denselben vier Regeln.</p>
+    <div class="meta">
+      <span><b>Hub</b> KRAKEN</span>
+      <span><b>CRM</b> RADAR</span>
+      <span><b>Servicedesk</b> GLPI</span>
+      <span><b>Projekte</b> Mission Control</span>
+      <span><b>ERP</b> SAP Business ByDesign</span>
+      <span><b>Verträge</b> contractSAFE auf SharePoint</span>
+      <span><b>Daten</b> Microsoft Fabric</span>
+    </div>
+
+    <div class="delta">
+      <div class="d"><div class="dd">Vertrieb</div><div class="dt">Das CRM füllt sich selbst</div><div class="dx">Drei Agenten recherchieren Firma, Kontakt und Signatur – der Vertrieb legt nur den Anlass an</div></div>
+      <div class="d"><div class="dd">Servicedesk</div><div class="dt">Antworten aus gelösten Tickets</div><div class="dx">Entwurf für den Techniker, Wissenssuche, direkte Antwort für freigegebene Standardfälle</div></div>
+      <div class="d"><div class="dd">Finanzen</div><div class="dt">Belege bis zum Buchungsvorschlag</div><div class="dx">Erkennen, mit der Bestellung abgleichen, vorschlagen – gebucht wird nach Freigabe</div></div>
+      <div class="d"><div class="dd">Verträge</div><div class="dt">Verträge legen sich selbst ab</div><div class="dx">Erkannt, benannt, mit Metadaten in SharePoint abgelegt – Fristen bleiben im Blick</div></div>
+      <div class="d"><div class="dd">Projekte</div><div class="dt">Besprechungen werden Arbeitspakete</div><div class="dx">Zusammenfassung, Aufgaben und Statusbericht entstehen aus dem Projekt selbst</div></div>
+      <div class="d goal"><div class="dd">Grundsatz</div><div class="dt">Kein Datum verlässt den Tenant</div><div class="dx">Alle KI-Dienste im eigenen Microsoft-Tenant, Region EU, kein Training auf unseren Daten, kein Dritt-SaaS</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LEITPLANKEN ============ -->
+<section id="leitplanken">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Leitplanken</div>
+      <h2>Vier Regeln, die für jeden Stern gelten</h2>
+      <p>Sie gelten für jeden Agenten auf dieser Karte – und für jeden, der dazukommt.</p>
+    </div>
+    <div class="rails">
+      <div class="rail">
+        <h3>Der Mensch entscheidet</h3>
+        <p>KI schlägt vor, protokolliert und wartet. Freigaben bleiben Klicks von Menschen – im Vertrieb, am Ticket, in der Finanzbuchhaltung. Kein Vorschlag geht ungeprüft an Kunden oder Lieferanten.</p>
+      </div>
+      <div class="rail">
+        <h3>Daten bleiben im Tenant</h3>
+        <p>Microsoft Foundry, Azure OpenAI, AI Search und Document Intelligence laufen <b>im eigenen Microsoft-Tenant, Region EU</b>. Kein Training auf unseren Daten, kein Dritt-SaaS, kein Kopieren in fremde Werkzeuge.</p>
+      </div>
+      <div class="rail">
+        <h3>KI liefert strukturiert, KRAKEN schreibt</h3>
+        <p>Jede Antwort ist JSON nach festem Schema. KRAKEN bewertet, prüft Dubletten und schreibt nach klaren Regeln: <b>Eingaben der Kollegen gewinnen</b>, jeder Schritt steht als Notiz am Datensatz. Freitext landet nie ungeprüft in Feldern.</p>
+      </div>
+      <div class="rail">
+        <h3>Abschaltbar und sparsam</h3>
+        <p>Dry-Run zuerst, eine Cron-Zeile raus heißt aus. An den Agenten geht nur, was er braucht – bei Firmen allein die Domain. Mails mit den Labels <b>„Privat"</b> und <b>„Vertraulich"</b> bleiben außen vor, Zwischenergebnisse werden gelöscht.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STERNKARTE ============ -->
+<section id="sternkarte">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternkarte</div>
+      <h2>Sechs Sternbilder, ein Nordstern</h2>
+      <p>Jeder Stern ist ein KI-Einsatz, jedes Sternbild eine Plattform. KRAKEN steuert alle Sternbilder – Takt, Status, Schreibregeln, Protokoll. Ein Tipp auf einen Stern springt zum passenden Abschnitt.</p>
+    </div>
+
+    <div class="chart-panel">
+      <div class="stamp">Sternkarte</div>
+      <div class="map-scroll">
+<svg class="map" viewBox="0 0 1000 640" role="img" aria-labelledby="mapTitle mapDesc" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title id="mapTitle">Sternkarte der KI-Einsätze</title>
+  <desc id="mapDesc">Sternbilder contractSAFE, Servicedesk, RADAR, Mission Control, SAP ByDesign und Datenplattform um den Hub KRAKEN, darüber der Nordstern.</desc>
+  <defs>
+    <radialGradient id="hubGrad" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1C3A4F"/>
+      <stop offset="100%" stop-color="#0E1B2B"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="softer" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+
+  <!-- Sternenhintergrund -->
+  <g opacity=".55">
+    <circle class="bg-star" cx="125.2" cy="321.6" r="1.8" opacity="0.67"/>
+    <circle class="bg-star" cx="945.7" cy="559.7" r="1.8" opacity="0.65"/>
+    <circle class="bg-star" cx="421.9" cy="365.3" r="1.4" opacity="0.74"/>
+    <circle class="bg-star" cx="585.1" cy="157.7" r="1.8" opacity="0.3"/>
+    <circle class="bg-star" cx="290.6" cy="69.2" r="0.7" opacity="0.78"/>
+    <circle class="bg-star" cx="682.2" cy="431.9" r="0.9" opacity="0.51"/>
+    <circle class="bg-star" cx="350.1" cy="631.3" r="1.1" opacity="0.77"/>
+    <circle class="bg-star" cx="991.7" cy="328.5" r="0.7" opacity="0.72"/>
+    <circle class="bg-star" cx="96.2" cy="343.8" r="1.1" opacity="0.55"/>
+    <circle class="bg-star" cx="870.5" cy="447.3" r="1.8" opacity="0.45"/>
+    <circle class="bg-star" cx="842.2" cy="238.2" r="1.4" opacity="0.52"/>
+    <circle class="bg-star" cx="400.4" cy="373.5" r="1.4" opacity="0.81"/>
+    <circle class="bg-star" cx="426.6" cy="508.8" r="1.8" opacity="0.82"/>
+    <circle class="bg-star" cx="399.8" cy="335.4" r="1.4" opacity="0.62"/>
+    <circle class="bg-star" cx="974.5" cy="328.1" r="0.7" opacity="0.62"/>
+    <circle class="bg-star" cx="761.6" cy="518.5" r="1.8" opacity="0.83"/>
+    <circle class="bg-star" cx="108.9" cy="396.3" r="1.4" opacity="0.34"/>
+    <circle class="bg-star" cx="878.2" cy="538.2" r="0.7" opacity="0.66"/>
+    <circle class="bg-star" cx="457.5" cy="300.9" r="1.8" opacity="0.41"/>
+    <circle class="bg-star" cx="403.6" cy="630.9" r="1.8" opacity="0.77"/>
+    <circle class="bg-star" cx="501.9" cy="306.8" r="1.4" opacity="0.53"/>
+    <circle class="bg-star" cx="297.7" cy="175.9" r="0.7" opacity="0.35"/>
+    <circle class="bg-star" cx="875.9" cy="607.5" r="1.8" opacity="0.85"/>
+    <circle class="bg-star" cx="362.2" cy="132.7" r="1.4" opacity="0.55"/>
+    <circle class="bg-star" cx="762.4" cy="318.2" r="1.4" opacity="0.61"/>
+    <circle class="bg-star" cx="900.7" cy="526.8" r="1.1" opacity="0.55"/>
+    <circle class="bg-star" cx="806.9" cy="281.6" r="1.8" opacity="0.42"/>
+    <circle class="bg-star" cx="915.2" cy="122.2" r="1.4" opacity="0.8"/>
+    <circle class="bg-star" cx="479.5" cy="48.1" r="1.1" opacity="0.84"/>
+    <circle class="bg-star" cx="372.2" cy="129.4" r="1.4" opacity="0.35"/>
+    <circle class="bg-star" cx="909.8" cy="65.5" r="1.4" opacity="0.63"/>
+    <circle class="bg-star" cx="925.3" cy="59.8" r="0.9" opacity="0.41"/>
+    <circle class="bg-star" cx="619.1" cy="477.2" r="1.1" opacity="0.68"/>
+    <circle class="bg-star" cx="633.2" cy="104.6" r="1.1" opacity="0.68"/>
+    <circle class="bg-star" cx="573.1" cy="586.0" r="1.4" opacity="0.7"/>
+    <circle class="bg-star" cx="930.5" cy="348.6" r="1.4" opacity="0.63"/>
+    <circle class="bg-star" cx="950.9" cy="554.6" r="1.8" opacity="0.44"/>
+    <circle class="bg-star" cx="419.1" cy="107.9" r="0.9" opacity="0.76"/>
+    <circle class="bg-star" cx="908.4" cy="198.9" r="1.4" opacity="0.5"/>
+    <circle class="bg-star" cx="154.2" cy="511.5" r="1.4" opacity="0.26"/>
+    <circle class="bg-star" cx="112.4" cy="562.0" r="0.7" opacity="0.79"/>
+    <circle class="bg-star" cx="643.9" cy="591.2" r="0.7" opacity="0.27"/>
+    <circle class="bg-star" cx="476.4" cy="434.1" r="1.4" opacity="0.46"/>
+    <circle class="bg-star" cx="127.4" cy="600.0" r="1.8" opacity="0.65"/>
+    <circle class="bg-star" cx="176.0" cy="376.9" r="0.9" opacity="0.53"/>
+    <circle class="bg-star" cx="339.0" cy="381.3" r="0.7" opacity="0.61"/>
+    <circle class="bg-star" cx="41.6" cy="411.9" r="0.9" opacity="0.28"/>
+    <circle class="bg-star" cx="544.1" cy="531.5" r="1.4" opacity="0.81"/>
+    <circle class="bg-star" cx="638.6" cy="309.9" r="0.7" opacity="0.33"/>
+    <circle class="bg-star" cx="529.5" cy="498.1" r="1.8" opacity="0.83"/>
+    <circle class="bg-star" cx="143.5" cy="420.6" r="0.9" opacity="0.5"/>
+    <circle class="bg-star" cx="426.5" cy="266.4" r="0.7" opacity="0.5"/>
+    <circle class="bg-star" cx="192.2" cy="117.0" r="1.4" opacity="0.57"/>
+    <circle class="bg-star" cx="775.8" cy="267.4" r="1.4" opacity="0.37"/>
+    <circle class="bg-star" cx="519.0" cy="285.4" r="1.8" opacity="0.77"/>
+    <circle class="bg-star" cx="792.0" cy="517.3" r="0.9" opacity="0.4"/>
+    <circle class="bg-star" cx="946.4" cy="556.3" r="1.1" opacity="0.52"/>
+    <circle class="bg-star" cx="778.8" cy="538.1" r="0.9" opacity="0.87"/>
+    <circle class="bg-star" cx="354.3" cy="105.8" r="1.8" opacity="0.7"/>
+    <circle class="bg-star" cx="787.1" cy="143.1" r="1.8" opacity="0.72"/>
+    <circle class="bg-star" cx="554.9" cy="362.5" r="0.9" opacity="0.62"/>
+    <circle class="bg-star" cx="561.8" cy="426.3" r="0.9" opacity="0.32"/>
+    <circle class="bg-star" cx="267.5" cy="603.8" r="0.9" opacity="0.32"/>
+    <circle class="bg-star" cx="67.5" cy="230.3" r="0.9" opacity="0.67"/>
+    <circle class="bg-star" cx="112.6" cy="203.7" r="1.8" opacity="0.79"/>
+    <circle class="bg-star" cx="294.4" cy="204.3" r="1.1" opacity="0.42"/>
+    <circle class="bg-star" cx="21.6" cy="548.7" r="1.1" opacity="0.52"/>
+    <circle class="bg-star" cx="23.2" cy="68.2" r="0.7" opacity="0.45"/>
+    <circle class="bg-star" cx="100.4" cy="358.2" r="1.1" opacity="0.45"/>
+    <circle class="bg-star" cx="456.7" cy="398.5" r="1.8" opacity="0.27"/>
+    <circle class="bg-star" cx="405.7" cy="387.3" r="1.8" opacity="0.55"/>
+    <circle class="bg-star" cx="971.4" cy="556.1" r="1.1" opacity="0.81"/>
+    <circle class="bg-star" cx="678.5" cy="584.4" r="1.4" opacity="0.44"/>
+    <circle class="bg-star" cx="811.7" cy="44.0" r="1.4" opacity="0.82"/>
+    <circle class="bg-star" cx="284.9" cy="214.3" r="0.7" opacity="0.44"/>
+    <circle class="bg-star" cx="418.0" cy="373.4" r="0.7" opacity="0.6"/>
+    <circle class="bg-star" cx="345.0" cy="358.0" r="0.7" opacity="0.36"/>
+    <circle class="bg-star" cx="128.7" cy="31.3" r="1.8" opacity="0.48"/>
+    <circle class="bg-star" cx="645.5" cy="417.2" r="0.7" opacity="0.53"/>
+    <circle class="bg-star" cx="132.3" cy="267.1" r="1.4" opacity="0.41"/>
+    <circle class="bg-star" cx="422.2" cy="145.0" r="0.9" opacity="0.37"/>
+    <circle class="bg-star" cx="36.0" cy="455.6" r="1.8" opacity="0.69"/>
+    <circle class="bg-star" cx="398.5" cy="167.1" r="0.9" opacity="0.4"/>
+    <circle class="bg-star" cx="24.3" cy="345.7" r="1.4" opacity="0.42"/>
+    <circle class="bg-star" cx="317.7" cy="597.2" r="1.8" opacity="0.31"/>
+    <circle class="bg-star" cx="184.4" cy="31.7" r="1.8" opacity="0.78"/>
+    <circle class="bg-star" cx="343.3" cy="332.8" r="1.1" opacity="0.29"/>
+    <circle class="bg-star" cx="835.2" cy="399.8" r="0.9" opacity="0.56"/>
+    <circle class="bg-star" cx="962.7" cy="431.8" r="0.9" opacity="0.85"/>
+    <circle class="bg-star" cx="899.5" cy="257.0" r="1.1" opacity="0.87"/>
+    <circle class="bg-star" cx="236.8" cy="525.3" r="1.1" opacity="0.81"/>
+    <circle class="bg-star" cx="376.7" cy="294.6" r="1.4" opacity="0.61"/>
+    <circle class="bg-star" cx="474.5" cy="500.1" r="1.8" opacity="0.45"/>
+    <circle class="bg-star" cx="163.8" cy="264.2" r="1.4" opacity="0.83"/>
+    <circle class="bg-star" cx="943.2" cy="515.8" r="1.8" opacity="0.71"/>
+    <circle class="bg-star" cx="790.6" cy="406.8" r="0.7" opacity="0.44"/>
+    <circle class="bg-star" cx="546.0" cy="173.4" r="0.7" opacity="0.9"/>
+    <circle class="bg-star" cx="26.1" cy="143.5" r="1.8" opacity="0.45"/>
+    <circle class="bg-star" cx="51.9" cy="253.4" r="1.8" opacity="0.88"/>
+    <circle class="bg-star" cx="516.3" cy="409.9" r="0.9" opacity="0.88"/>
+    <circle class="bg-star" cx="111.2" cy="96.5" r="1.4" opacity="0.47"/>
+    <circle class="bg-star" cx="265.3" cy="34.0" r="1.8" opacity="0.68"/>
+    <circle class="bg-star" cx="194.7" cy="568.9" r="1.1" opacity="0.6"/>
+    <circle class="bg-star" cx="359.5" cy="615.0" r="0.9" opacity="0.88"/>
+    <circle class="bg-star" cx="627.7" cy="536.7" r="1.4" opacity="0.86"/>
+    <circle class="bg-star" cx="358.0" cy="490.0" r="1.8" opacity="0.36"/>
+    <circle class="bg-star" cx="515.9" cy="120.1" r="1.8" opacity="0.34"/>
+    <circle class="bg-star" cx="36.0" cy="80.8" r="0.7" opacity="0.8"/>
+    <circle class="bg-star" cx="70.6" cy="196.9" r="1.8" opacity="0.35"/>
+    <circle class="bg-star" cx="608.3" cy="87.0" r="1.1" opacity="0.56"/>
+  </g>
+
+  <!-- Kurslinie Hub → Nordstern -->
+  <line class="course" x1="500" y1="518" x2="500" y2="98"/>
+
+  <!-- Nordstern (verlinkt auf die KPI-Tafel) -->
+  <a class="polaris-link" href="#nordstern"><title>Was der Nordstern bringt: Mehr Umsatz, mehr Durchsatz, mehr Power – mit denselben Leuten</title>
+    <circle class="polaris-glow" cx="500" cy="64" r="34" filter="url(#softer)"/>
+    <path class="polaris" d="M500 36 L506 58 L528 64 L506 70 L500 92 L494 70 L472 64 L494 58 Z"/>
+    <circle cx="500" cy="64" r="4" fill="#FFFBF0"/>
+    <text class="pol-t" x="526" y="58">Nordstern</text>
+    <text class="pol-s" x="526" y="80">KI als Bauteil jeder Plattform <tspan class="pol-k">· tippen: was er bringt</tspan></text>
+      </a>
+
+  <!-- Hub-Verbindungen -->
+  <line class="hubl" x1="500" y1="545" x2="275" y2="300"/>
+  <line class="hubl" x1="476" y1="545" x2="360" y2="560"/>
+  <line class="hubl" x1="500" y1="545" x2="700" y2="548"/>
+  <line class="hubl" x1="500" y1="545" x2="892" y2="400"/>
+  <line class="hubl" x1="500" y1="545" x2="650" y2="615"/>
+
+  <!-- ===== contractSAFE ===== -->
+  <text class="cname" x="60" y="40">contractSAFE · SharePoint</text>
+  <g class="cl">
+    <line x1="110" y1="100" x2="240" y2="80"/>
+    <line x1="240" y1="80" x2="350" y2="118"/>
+  </g>
+  <a class="st live" href="#contractsafe"><title>Vertragserkennung: Art, Parteien, Laufzeit, Kündigungsfrist</title>
+    <circle class="halo" cx="110" cy="100" r="13" filter="url(#soft)"/><circle class="core" cx="110" cy="100" r="7"/>
+    <text class="lbl" x="110" y="124" text-anchor="middle">Vertragserkennung</text></a>
+  <a class="st live" href="#contractsafe"><title>Ablage und Metadaten in SharePoint</title>
+    <circle class="halo" cx="240" cy="80" r="13" filter="url(#soft)"/><circle class="core" cx="240" cy="80" r="7"/>
+    <text class="lbl" x="240" y="66" text-anchor="middle">Ablage &amp; Metadaten</text></a>
+  <a class="st live" href="#contractsafe"><title>Fristenwächter: Kündigungs- und Verlängerungstermine</title>
+    <circle class="halo" cx="350" cy="118" r="13" filter="url(#soft)"/><circle class="core" cx="350" cy="118" r="7"/>
+    <text class="lbl" x="363" y="122">Fristenwächter</text></a>
+
+  <!-- ===== Servicedesk · GLPI ===== -->
+  <text class="cname" x="60" y="160">Servicedesk · GLPI</text>
+  <g class="cl">
+    <line x1="155" y1="330" x2="195" y2="260"/>
+    <line x1="195" y1="260" x2="275" y2="300"/>
+    <line x1="195" y1="260" x2="305" y2="225"/>
+    <line x1="305" y1="225" x2="140" y2="200"/>
+    <line x1="140" y1="200" x2="195" y2="260"/>
+  </g>
+  <a class="st live" href="#servicedesk"><title>Herkunfts-Tags: Standort, Netz, Homeoffice, VPN am Ticket</title>
+    <circle class="halo" cx="155" cy="330" r="13" filter="url(#soft)"/><circle class="core" cx="155" cy="330" r="7"/>
+    <text class="lbl" x="143" y="334" text-anchor="end">Herkunfts-Tags</text></a>
+  <a class="st live" href="#servicedesk"><title>Antwortentwurf als private Notiz für den Techniker</title>
+    <circle class="halo" cx="195" cy="260" r="13" filter="url(#soft)"/><circle class="core" cx="195" cy="260" r="7"/>
+    <text class="lbl" x="183" y="264" text-anchor="end">Antwortentwurf</text></a>
+  <a class="st live" href="#servicedesk"><title>Wissenssuche über gelöste Tickets</title>
+    <circle class="halo" cx="275" cy="300" r="13" filter="url(#soft)"/><circle class="core" cx="275" cy="300" r="7"/>
+    <text class="lbl" x="288" y="304">Wissenssuche (RAG)</text></a>
+  <a class="st live" href="#servicedesk"><title>KI-Antworten für freigegebene Standardfälle</title>
+    <circle class="halo" cx="305" cy="225" r="13" filter="url(#soft)"/><circle class="core" cx="305" cy="225" r="7"/>
+    <text class="lbl" x="305" y="204" text-anchor="middle">KI-Antworten · Standardfälle</text></a>
+  <a class="st live" href="#servicedesk"><title>Ticket-Klassifizierung und Wissensartikel</title>
+    <circle class="halo" cx="140" cy="200" r="13" filter="url(#soft)"/><circle class="core" cx="140" cy="200" r="7"/>
+    <text class="lbl" x="140" y="182" text-anchor="middle">Ticket-Klassifizierung</text></a>
+
+  <!-- ===== RADAR · CRM ===== -->
+  <text class="cname" x="60" y="368">RADAR · CRM</text>
+  <g class="cl">
+    <line x1="280" y1="505" x2="360" y2="560"/>
+    <line x1="360" y1="560" x2="420" y2="520"/>
+    <line x1="280" y1="505" x2="225" y2="460"/>
+    <line x1="225" y1="460" x2="320" y2="398"/>
+    <line x1="320" y1="398" x2="365" y2="440"/>
+    <line x1="365" y1="440" x2="420" y2="520"/>
+  </g>
+  <a class="st live" href="#radar"><title>Firmenrecherche aus der Domain</title>
+    <circle class="halo" cx="280" cy="505" r="13" filter="url(#soft)"/><circle class="core" cx="280" cy="505" r="7"/>
+    <text class="lbl" x="268" y="509" text-anchor="end">Firmenrecherche</text></a>
+  <a class="st live" href="#radar"><title>Kontaktrecherche: Position, Zuständigkeit, Rolle</title>
+    <circle class="halo" cx="360" cy="560" r="13" filter="url(#soft)"/><circle class="core" cx="360" cy="560" r="7"/>
+    <text class="lbl" x="360" y="586" text-anchor="middle">Kontaktrecherche</text></a>
+  <a class="st live" href="#radar"><title>Signaturleser: Kontaktdaten aus der Mailsignatur</title>
+    <circle class="halo" cx="420" cy="520" r="13" filter="url(#soft)"/><circle class="core" cx="420" cy="520" r="7"/>
+    <text class="lbl" x="408" y="524" text-anchor="end">Signaturleser</text></a>
+  <a class="st live" href="#radar"><title>Teams-Karte für neue Kontakte</title>
+    <circle class="halo" cx="225" cy="460" r="13" filter="url(#soft)"/><circle class="core" cx="225" cy="460" r="7"/>
+    <text class="lbl" x="213" y="464" text-anchor="end">Teams-Karte Kontakte</text></a>
+  <a class="st live" href="#radar"><title>Meeting-Zusammenfassung am Kundendatensatz</title>
+    <circle class="halo" cx="320" cy="398" r="13" filter="url(#soft)"/><circle class="core" cx="320" cy="398" r="7"/>
+    <text class="lbl" x="307" y="395" text-anchor="end">Meeting-Zusammenfassung</text></a>
+  <a class="st live" href="#radar"><title>Termin-Briefing vor dem Kundentermin</title>
+    <circle class="halo" cx="365" cy="440" r="13" filter="url(#soft)"/><circle class="core" cx="365" cy="440" r="7"/>
+    <text class="lbl" x="353" y="447" text-anchor="end">Termin-Briefing</text></a>
+
+  <!-- ===== KRAKEN Hub ===== -->
+  <g class="hub">
+    <circle cx="500" cy="545" r="38" fill="#4FD8D2" opacity=".12" filter="url(#softer)"/>
+    <circle class="hub-fill" cx="500" cy="545" r="24"/>
+    <circle cx="500" cy="545" r="5" fill="#4FD8D2"/>
+    <text class="hub-t" x="500" y="594" text-anchor="middle">KRAKEN</text>
+    <text class="hub-s" x="500" y="612" text-anchor="middle">Takt · Status · Regeln · Protokoll</text>
+  </g>
+  <a class="st live" href="#kraken"><title>Tageslagebild in Klartext</title>
+    <circle class="halo" cx="650" cy="615" r="13" filter="url(#soft)"/><circle class="core" cx="650" cy="615" r="7"/>
+    <text class="lbl" x="663" y="619">Tageslagebild in Klartext</text></a>
+
+  <!-- ===== Mission Control ===== -->
+  <text class="cname" x="770" y="452">Mission Control</text>
+  <g class="cl">
+    <line x1="700" y1="478" x2="700" y2="548"/>
+    <line x1="700" y1="478" x2="800" y2="530"/>
+    <line x1="800" y1="530" x2="700" y2="548"/>
+  </g>
+  <a class="st live" href="#missioncontrol"><title>Excel-Import OPL/WBS, KI-gestützt aufbereitet</title>
+    <circle class="halo" cx="700" cy="548" r="13" filter="url(#soft)"/><circle class="core" cx="700" cy="548" r="7"/>
+    <text class="lbl" x="700" y="574" text-anchor="middle">Excel-Import OPL/WBS</text></a>
+  <a class="st live" href="#missioncontrol"><title>Besprechung → Arbeitspakete</title>
+    <circle class="halo" cx="700" cy="478" r="13" filter="url(#soft)"/><circle class="core" cx="700" cy="478" r="7"/>
+    <text class="lbl" x="713" y="478">Besprechung → Arbeitspakete</text></a>
+  <a class="st live" href="#missioncontrol"><title>Projekt-Statusbericht in Klartext</title>
+    <circle class="halo" cx="800" cy="530" r="13" filter="url(#soft)"/><circle class="core" cx="800" cy="530" r="7"/>
+    <text class="lbl" x="813" y="534">Projekt-Statusbericht</text></a>
+
+  <!-- ===== SAP Business ByDesign ===== -->
+  <text class="cname" x="960" y="222" text-anchor="end">SAP Business ByDesign</text>
+  <g class="cl">
+    <line x1="892" y1="400" x2="875" y2="305"/>
+    <line x1="875" y1="305" x2="948" y2="352"/>
+    <line x1="875" y1="305" x2="935" y2="258"/>
+  </g>
+  <a class="st live" href="#sap"><title>Offboarding-Automation im ERP</title>
+    <circle class="halo" cx="892" cy="400" r="13" filter="url(#soft)"/><circle class="core" cx="892" cy="400" r="7"/>
+    <text class="lbl" x="876" y="404" text-anchor="end">Offboarding-Automation</text></a>
+  <a class="st live" href="#sap"><title>Belegerkennung Eingangsrechnung</title>
+    <circle class="halo" cx="875" cy="305" r="13" filter="url(#soft)"/><circle class="core" cx="875" cy="305" r="7"/>
+    <text class="lbl" x="863" y="309" text-anchor="end">Belegerkennung Eingangsrechnung</text></a>
+  <a class="st live" href="#sap"><title>Bestellabgleich und Buchungsvorschlag</title>
+    <circle class="halo" cx="948" cy="352" r="13" filter="url(#soft)"/><circle class="core" cx="948" cy="352" r="7"/>
+    <text class="lbl" x="936" y="356" text-anchor="end">Bestellabgleich &amp; Buchungsvorschlag</text></a>
+  <a class="st live" href="#sap"><title>Weitere Belegarten auf derselben Strecke</title>
+    <circle class="halo" cx="935" cy="258" r="13" filter="url(#soft)"/><circle class="core" cx="935" cy="258" r="7"/>
+    <text class="lbl" x="923" y="262" text-anchor="end">Weitere Belegarten</text></a>
+
+  <!-- ===== Datenplattform · Fabric ===== -->
+  <text class="cname" x="960" y="100" text-anchor="end">Datenplattform · Fabric</text>
+  <g class="cl">
+    <line x1="770" y1="160" x2="880" y2="140"/>
+  </g>
+  <a class="st live" href="#kraken"><title>OneLake-Export in die Datenplattform</title>
+    <circle class="halo" cx="770" cy="160" r="13" filter="url(#soft)"/><circle class="core" cx="770" cy="160" r="7"/>
+    <text class="lbl" x="770" y="184" text-anchor="middle">OneLake-Export</text></a>
+  <a class="st live" href="#kraken"><title>Fragen in Klartext an die Projektdaten</title>
+    <circle class="halo" cx="880" cy="140" r="13" filter="url(#soft)"/><circle class="core" cx="880" cy="140" r="7"/>
+    <text class="lbl" x="880" y="122" text-anchor="middle">Fragen in Klartext</text></a>
+</svg>
+      </div>
+      <div class="swipe">← wischen für die ganze Karte →</div>
+      <div class="legend">
+        <span><span class="dot live"></span>Stern = ein KI-Einsatz</span>
+        <span><span class="dot plan" style="border-color:var(--bio)"></span>Verbindungen = KRAKEN steuert das Sternbild</span>
+        <span><span class="dot goal"></span>Nordstern = KI als Bauteil jeder Plattform · <a href="#nordstern">was er bringt</a></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NORDSTERN-TAFEL ============ -->
+<section id="nordstern">
+  <div class="wrap">
+    <div class="tafel">
+      <div class="eyebrow">Nordstern · Was er bringt</div>
+      <h2>Dieselben Leute. Mehr von allem.<span class="thin">Mehr Umsatz, mehr Durchsatz, mehr Power – ohne eine Stelle für Routine.</span></h2>
+      <p class="lede">Jeder Stern nimmt Menschen Routine ab und gibt ihnen Entscheidungen zurück. Betriebswirtschaftlich ist das ein Hebel: Das Volumen wächst, der Headcount in Vertrieb und Verwaltung bleibt flach – und mit jedem Auftrag sinkt die Verwaltungskostenquote.</p>
+
+      <div class="lever">
+<svg class="lever-svg" viewBox="0 0 1000 390" role="img" aria-label="Schema: Vorgänge und Köpfe mit und ohne KI bei wachsendem Geschäftsvolumen">
+  <!-- Fläche: Hebel -->
+  <polygon class="gap" points="90,300 790,128 790,262"/>
+  <!-- Achsen -->
+  <path class="ax" d="M90 40 V300 H930"/>
+  <path class="ax" d="M924 294 L930 300 L924 306"/>
+  <path class="ax" d="M84 46 L90 40 L96 46"/>
+  <text class="axl" x="510" y="336" text-anchor="middle">Geschäftsvolumen →</text>
+  <text class="axl" x="-170" y="62" text-anchor="middle" transform="rotate(-90)">Köpfe · Vorgänge →</text>
+  <!-- Linien -->
+  <path class="ln-vorg" d="M90 300 L790 80"/>
+  <path class="ln-ohne" d="M90 300 L790 128"/>
+  <path class="ln-mit"  d="M90 300 Q440 284 790 262"/>
+  <!-- Beschriftungen -->
+  <text class="ll vorg" x="802" y="84">Vorgänge</text>
+  <text class="gaps" x="802" y="102">Tickets, Belege,</text>
+  <text class="gaps" x="802" y="118">Kontakte, Verträge</text>
+  <text class="ll ohne" x="802" y="150">Köpfe ohne KI</text>
+  <text class="ll mit"  x="802" y="266">Köpfe mit KI</text>
+  <text class="gaps" x="802" y="284">Vertrieb &amp; Verwaltung</text>
+  <text class="gapl" x="520" y="226">Der Hebel</text>
+  <text class="gaps" x="520" y="244">Kapazität aus KI statt aus Köpfen –</text>
+  <text class="gaps" x="520" y="262">Routine wird Entscheidungszeit</text>
+  <!-- Legende unten -->
+  <line x1="90" y1="372" x2="118" y2="372" class="ln-vorg"/><text class="gaps" x="126" y="376">Vorgänge</text>
+  <line x1="220" y1="372" x2="248" y2="372" class="ln-ohne"/><text class="gaps" x="256" y="376">Köpfe ohne KI</text>
+  <line x1="380" y1="372" x2="408" y2="372" class="ln-mit"/><text class="gaps" x="416" y="376">Köpfe mit KI</text>
+  <rect x="540" y="366" width="28" height="12" class="gap" style="opacity:.35"/><text class="gaps" x="576" y="376">Hebel: vermiedene Stellen und gewonnene Kapazität</text>
+</svg>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="dd">Vertrieb</div>
+          <h3>Mehr Umsatz</h3>
+          <div class="how">Verkaufen statt tippen: Das CRM füllt sich selbst, das Protokoll steht vor dem Zuklappen des Laptops.</div>
+          <ul>
+            <li class="up">Qualifizierte Kontakte je Vertriebstag<small>Firma, Position, Relevanz liegen vor dem ersten Anruf vor</small></li>
+            <li class="down">Zeit vom Erstkontakt bis zum Angebot<small>Briefing vor dem Termin, Aufgaben nach dem Termin – automatisch</small></li>
+            <li class="up">Pipeline-Geschwindigkeit<small>Kein Vorgang wartet auf eine Nachbearbeitung</small></li>
+          </ul>
+        </div>
+        <div class="kpi">
+          <div class="dd">Servicedesk · Finanzen · Verträge</div>
+          <h3>Mehr Durchsatz</h3>
+          <div class="how">Vorgänge laufen durch, Menschen entscheiden nur noch.</div>
+          <ul>
+            <li class="up">Belege je Buchhaltungstag<small>Erkannt, abgeglichen, vorgeschlagen – ein Freigabe-Klick</small></li>
+            <li class="down">Lösungszeit je Ticket<small>Standardfälle ohne Wartezeit, Rest mit fertigem Entwurf</small></li>
+            <li class="zero">Verträge mit Fristversäumnis: null<small>Jede Frist meldet sich selbst beim Owner</small></li>
+          </ul>
+        </div>
+        <div class="kpi">
+          <div class="dd">Projekte · Daten · Führung</div>
+          <h3>Mehr Power</h3>
+          <div class="how">Entscheiden statt suchen: Antworten kommen aus dem System, mit Quelle.</div>
+          <ul>
+            <li class="down">Zeit bis zur Antwort auf eine Managementfrage<small>Minuten statt Tage – Auslastung, Termine, Kosten in Klartext</small></li>
+            <li class="up">Projektstatus ohne Folien<small>Wöchentlich aus den Arbeitspaketen, nicht aus Erinnerungen</small></li>
+            <li class="up">Risiken sichtbar, bevor sie fällig sind<small>Überfällige Pakete, Fristen, Abweichungen – gemeldet, nicht entdeckt</small></li>
+          </ul>
+        </div>
+        <div class="kpi same">
+          <div class="dd">Organisation</div>
+          <h3>Dieselben Leute</h3>
+          <div class="how">Wachstum ohne Verwaltungs-Headcount – die Kosten bleiben, wo sie Wert schaffen.</div>
+          <ul>
+            <li class="flat">Headcount Vertrieb &amp; Verwaltung bei wachsendem Volumen<small>Keine Einstellung für Routine</small></li>
+            <li class="up">Vorgänge je Kopf<small>Der Hebel aus dem Schaubild, gemessen je Sternbild</small></li>
+            <li class="down">Verwaltungskostenquote<small>KI kostet Cent je Vorgang, mit Deckel je Dienst</small></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="formel">
+        <span class="f">Köpfe in Vertrieb &amp; Verwaltung</span><span class="op">×</span>
+        <span class="f">Routinestunden je Tag</span><span class="op">÷</span>
+        <span class="f">8 h</span><span class="op">=</span>
+        <span class="f res">gewonnene Vollzeitkapazität – ohne eine Einstellung</span>
+        <span class="note"><b>Rechenschema:</b> 20 Köpfe × 1,5 h ÷ 8 h = 3,75 Vollzeitstellen. Die Routine übernehmen die Sterne; die Stunden gehen an Kunden, Abschlüsse und Entscheidungen. Gegenrechnung: KI-Kosten im Cent-Bereich je Vorgang, gedeckelt je Dienst.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADAR ============ -->
+<section id="radar">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternbild RADAR</div>
+      <h2>KI im Vertrieb: Das CRM füllt sich selbst</h2>
+      <p>Der Vertrieb legt nur noch den Anlass an – eine Firma, einen Kontakt, eine Mail. <b>KRAKEN</b> fragt die Agenten, prüft die Antwort und schreibt sie ins CRM. Jede Eingabe eines Kollegen bleibt stehen, jede Anreicherung steht als Notiz am Datensatz.</p>
+    </div>
+    <div class="grid">
+      <div class="card live">
+        <div class="top"><div class="name">Firmenrecherche</div></div>
+        <div class="route">Firma „Initial" → <b>nur die Domain</b> → Agent BusinessResearch → 40 Felder als JSON → KRAKEN prüft &amp; schreibt → „Angelegt" oder „Prüfen"</div>
+        <p>Rechtsform, Sitz, Branche, Handelsregister, Zertifikate, Umsatzklasse, Management laut Impressum – und eine <b>Relevanz fürs eigene Geschäft mit Begründung</b>: Kunde, Lieferant, Partner, Wettbewerber. Dublettenprüfung über sechs Signale, Newsfeed je Firma, Cache 30 Tage. Ein ganzer Firmenbestand ist in einer Nacht recherchiert.</p>
+        <div class="tag human">Mensch: Vertrieb löst „Prüfen" auf, seine Eingaben gewinnen</div>
+      </div>
+      <div class="card live">
+        <div class="top"><div class="name">Kontaktrecherche</div></div>
+        <div class="route">Kontakt „Initial" → Name, Firma, Website → Agent ContactResearch → Position, Zuständigkeit, Rolle im Entscheidungsprozess</div>
+        <p>Quellen sind die Firmenwebsite, Fachpresse, Register und öffentliche Berufsprofile – <b>Datenhändler sind keine Quelle</b>, Kontaktdaten nur, wenn das Unternehmen sie selbst veröffentlicht. Erst die Firma, dann die Person. Was die Websuche nicht hergibt, liefert der Signaturleser.</p>
+        <div class="tag human">Mensch: Vertrieb bestätigt oder korrigiert</div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name">Signaturleser</div></div>
+        <div class="route">Eingehende Mail (inkl. Verlauf und Signaturgrafiken) → Agent SignatureParse, <b>ohne Websuche</b> → Position, Abteilung, Telefon, Adresse</div>
+        <p>Liest nur die Signatur des Absenders, rät nichts und ergänzt nichts. Regel: <b>Signatur schlägt Recherche, Mensch schlägt beide.</b> Kommt eine neue Mail, wird neu gelesen – so erkennt RADAR Jobwechsel von selbst.</p>
+        <div class="tag human">Mensch: Handeingaben bleiben stehen, Abweichungen stehen in der Notiz</div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name">Mail-Intake</div></div>
+        <div class="route">Kopie jeder Vertriebsmail → Sammelpostfach → KRAKEN ordnet Firma und Kontakt zu</div>
+        <p>Ohne Zutun der Kollegen landet der Schriftverkehr am richtigen Datensatz. Mails mit den Labels <b>„Privat"</b> und <b>„Vertraulich"</b> werden gar nicht erst kopiert – Datenschutz vor dem ersten Byte.</p>
+        <div class="tag base">Keine KI – aber die Quelle für alles darüber</div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name">Teams-Karte für neue Kontakte</div></div>
+        <div class="route">Mail an eine neue externe Adresse → Teams-Karte fragt Vorname, Nachname, Firma → Firma anlegen und recherchieren → Person recherchieren</div>
+        <p>Der Mensch liefert die drei Angaben, die eine Mailadresse nicht hergibt – alles Weitere übernehmen die Agenten.</p>
+        <div class="tag human">Mensch: ein Klick je neuem Kontakt</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Meeting-Zusammenfassung im CRM</div></div>
+        <div class="route">Teams-Termin mit dem Kunden → Transkript → Agent → Zusammenfassung, Entscheidungen, Aufgaben, nächste Schritte als Notiz an Firma oder Opportunity</div>
+        <p>Nach dem Termin steht das Protokoll im CRM, bevor jemand den Laptop zuklappt – mit Aufgaben an die richtigen Kollegen. Der Vertrieb bestätigt mit einem Klick. Aufgezeichnet wird nur mit Einwilligung der Teilnehmer; die Datenschutz-Freigabe ist Teil der Strecke.</p>
+        <div class="tag human">Mensch: bestätigt Notiz und Aufgaben</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Termin-Briefing</div></div>
+        <div class="route">Vor dem Termin → Mailverlauf, Newsfeed, offene Punkte → eine Seite „Was lief zuletzt mit dieser Firma?"</div>
+        <p>Dieselbe Engine wie die Zusammenfassung, nur vorwärts gedacht: Wer geht mit welchem Stand ins Gespräch. Kein neues System, nur eine Notiz zur rechten Zeit.</p>
+        <div class="tag">Dazu: regelmäßige Neurecherche für Schlüsselkunden</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICEDESK ============ -->
+<section id="servicedesk">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternbild Servicedesk</div>
+      <h2>KI in den Tickets: Vom Entwurf zur Antwort</h2>
+      <p>Drei Stufen arbeiten zusammen: Entwurf, Wissenssuche, direkte Antwort. Jede Stufe erweitert die vorige, keine überspringt den Techniker.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="top"><div class="name">Herkunfts-Tags</div></div>
+        <div class="route">Neues Ticket → BeyondTrust-Auskunft + IP-Matrix → Tags Standort, Netz, Homeoffice, VPN in ≤ 2 Minuten</div>
+        <p>Jedes Ticket trägt automatisch, von wo der Kollege gearbeitet hat. Regelbasiert, ohne KI – aber genau der Kontext, den ein Antwortentwurf braucht.</p>
+        <div class="tag base">Dazu: der komplette Gerätebestand im selben System</div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name">Antwortentwurf als private Notiz</div></div>
+        <div class="route">Neues IT-Ticket → ähnliche <b>gelöste</b> Tickets → Azure OpenAI im Tenant → Vorschlag als private Notiz, nur für Techniker sichtbar</div>
+        <p>Der Techniker übernimmt, ändert oder ignoriert. <b>Nie</b> geht ein Vorschlag automatisch an den Anfragenden. Kill-Switch: Webhook aus, alles steht. Gemessen wird der Anteil übernommener Vorschläge – nicht die Zahl der generierten.</p>
+        <div class="tag human">Mensch: jede Antwort geht durch den Techniker</div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name">Wissenssuche über gelöste Tickets</div></div>
+        <div class="route">Nächtlicher Index aller gelösten IT-Tickets → Azure AI Search → findet „E-Mail-Programm hängt" ≈ „Outlook startet nicht"</div>
+        <p>Die Lösung von gestern findet das Ticket von heute – auch wenn die Worte andere sind. Strikt je Bereich: IT-, HR- und QM-Tickets bleiben getrennte Indizes.</p>
+        <div class="tag">Wissensbasis-Artikel als zweite Quelle</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">KI-Antworten in Tickets</div></div>
+        <div class="route">Katalog freigegebener Standardfälle → KI antwortet direkt → Techniker gibt mit einem Klick frei oder lässt den Fall automatisch laufen</div>
+        <p>Passwort zurücksetzen, VPN einrichten, Drucker verbinden: Für Fälle, die hundertmal gleich gelöst wurden, antwortet die KI selbst – mit Anleitung, Rückfrage oder Verweis. Alles andere bleibt Entwurf. Der Katalog wächst nur durch Freigabe der IT.</p>
+        <div class="tag human">Mensch: entscheidet, welche Fälle in den Katalog kommen</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Ticket-Klassifizierung</div></div>
+        <div class="route">Neues Ticket → Kategorie, Priorität, Zuständigkeit vorgeschlagen → Lösung gefunden → Wissensbasis-Artikel als Entwurf</div>
+        <p>Die KI sortiert vor, der Techniker bestätigt. Aus gelösten Tickets entstehen Wissensartikel, die niemand mehr nachträglich schreiben muss.</p>
+        <div class="tag human">Mensch: bestätigt Einordnung und Artikel</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SAP ============ -->
+<section id="sap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternbild SAP Business ByDesign</div>
+      <h2>Belege: Vom Posteingang zum Buchungsvorschlag</h2>
+      <p>Die Belegstrecke läuft durchgängig: erkennen, abgleichen, vorschlagen – <b>gebucht wird erst nach Freigabe</b> der Finanzbuchhaltung.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="top"><div class="name">Offboarding-Automation</div></div>
+        <div class="route">Austritt im HR-System → KRAKEN setzt im ERP Rollen, Gültigkeiten und Vertretung – per UI-Automation</div>
+        <p>Derselbe Schreibweg trägt die Belegstrecke und den Stammdaten-Abgleich zwischen ERP und Hub – ohne Handarbeit, ohne Doppelerfassung.</p>
+        <div class="tag base">Keine KI – aber der Schreibweg ins ERP</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Belegerkennung Eingangsrechnung</div></div>
+        <div class="route">Rechnung per Mail oder PDF → Azure Document Intelligence im Tenant → Lieferant, Rechnungsnummer, Datum, Beträge, Positionen, Bestellbezug → Prüfung der Pflichtangaben</div>
+        <p>Kein Abtippen, kein Suchen nach der Bestellnummer: Die Rechnung kommt strukturiert an, Pflichtangaben nach § 14 UStG sind geprüft, Unklares wird markiert statt geraten.</p>
+        <div class="tag human">Mensch: Finanzbuchhaltung sieht jede Rechnung vor der Buchung</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Bestellabgleich &amp; Buchungsvorschlag</div></div>
+        <div class="route">Rechnung ↔ Bestellung ↔ Wareneingang → Abweichungen markiert → Buchungsvorschlag im ERP → Freigabe → gebucht</div>
+        <p>Stimmen Menge, Preis und Lieferung, liegt der Vorschlag fertig im ERP. Weicht etwas ab, entsteht ein Ticket an den Besteller – nicht an die Buchhaltung. Durchgängig heißt: vom Posteingang bis zur Buchung ein Fluss, mit einem Freigabe-Klick in der Mitte.</p>
+        <div class="tag human">Mensch: ein Freigabe-Klick in der Mitte der Strecke</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Weitere Belegarten</div></div>
+        <div class="route">Lieferscheine, Auftragsbestätigungen, Spesenbelege → dieselbe Strecke</div>
+        <p>Jede weitere Belegart ist nur ein Erkennungsmodell und eine Schreibregel – kein neues Projekt.</p>
+        <div class="tag human">Mensch: Fachbereich gibt je Belegart die Regeln vor</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTRACTSAFE ============ -->
+<section id="contractsafe">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternbild contractSAFE</div>
+      <h2>Verträge: Erkannt, abgelegt, im Blick</h2>
+      <p>Ein Vertrag kommt per Mail, Scan oder Upload – und findet seinen Platz in SharePoint von selbst: richtige Bibliothek, sauberer Name, vollständige Metadaten. <b>Was unklar ist, landet beim Vertragsowner, nicht im falschen Ordner.</b></p>
+    </div>
+    <div class="grid">
+      <div class="card live">
+        <div class="top"><div class="name">Vertragserkennung</div></div>
+        <div class="route">Dokument im Posteingang, Scan oder Upload → Azure Document Intelligence + Agent → Vertrag ja/nein, Vertragsart, Parteien, Beginn, Laufzeit, Kündigungsfrist, Wert → strukturiertes JSON</div>
+        <p>Die KI erkennt, ob ein Dokument ein Vertrag ist, welche Art, mit wem und bis wann – auch bei Anhängen, Nachträgen und gescannten Unterschriftenseiten. Unsichere Felder werden markiert statt geraten.</p>
+        <div class="tag human">Mensch: Zweifelsfälle gehen an den Vertragsowner</div>
+      </div>
+      <div class="card live">
+        <div class="top"><div class="name">Ablage &amp; Metadaten</div></div>
+        <div class="route">JSON → KRAKEN → richtige Bibliothek und Ordner in contractSAFE → Benennung nach Schema → Metadaten gesetzt (Partner, Art, Beginn, Ende, Kündigungsfrist, Owner) → Dublettenprüfung</div>
+        <p>Kein Ordner-Suchen, kein Umbenennen, keine leeren Metadatenspalten: Der Vertrag liegt dort, wo das Schema ihn vorsieht, und ist über Partner, Art und Datum sofort auffindbar. Nachträge hängen am Hauptvertrag.</p>
+        <div class="tag human">Mensch: Owner bestätigt die Ablage, der Freigabe-Workflow bleibt</div>
+      </div>
+      <div class="card live">
+        <div class="top"><div class="name">Fristenwächter</div></div>
+        <div class="route">Kündigungs- und Verlängerungsfristen aus den Metadaten → Erinnerung an Owner und Vertretung → Eskalation vor Ablauf → Übersicht auslaufender Verträge</div>
+        <p>Keine stillschweigende Verlängerung mehr, weil die Frist in einem PDF stand. Der Wächter meldet rechtzeitig, mit Vertrag, Partner und Entscheidungsfrage – entscheiden tut der Owner.</p>
+        <div class="tag human">Mensch: entscheidet über Kündigung oder Verlängerung</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MISSION CONTROL ============ -->
+<section id="missioncontrol">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sternbild Mission Control</div>
+      <h2>Projekte: Aus Besprechungen werden Arbeitspakete</h2>
+      <p>Mission Control hat MS Project abgelöst. KI holt alte Excel-Pläne in die Plattform und arbeitet im Projektalltag mit – Besprechung, Arbeitspakete, Statusbericht.</p>
+    </div>
+    <div class="grid">
+      <div class="card live">
+        <div class="top"><div class="name">Excel-Import OPL / WBS</div></div>
+        <div class="route">Excel-Liste → KI-gestützt normalisiert (Kürzel über das AD aufgelöst, Kommentare in datierte Einträge zerlegt) → idempotenter Import</div>
+        <p>Hunderte Arbeitspakete und Kommentare sind so aus Excel-Listen in die Plattform gewandert – mit Autor, Termin und Verlauf. Jede weitere Liste geht denselben Weg in Stunden statt Tagen.</p>
+        <div class="tag base">KI bereitet auf, der Import schreibt idempotent</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Besprechung → Arbeitspakete</div></div>
+        <div class="route">Protokoll oder Transkript → Vorschlag neuer Arbeitspakete im Projekt → Projektleitung bestätigt → angelegt mit Verantwortlichem und Termin</div>
+        <p>Dieselbe Engine wie die Meeting-Zusammenfassung im CRM, nur mit anderem Ziel: Die Offene-Punkte-Liste entsteht in der Besprechung, nicht danach.</p>
+        <div class="tag human">Mensch: Projektleitung bestätigt jedes Paket</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Projekt-Statusbericht</div></div>
+        <div class="route">Wöchentlich je Projekt → erledigt, überfällig, kritisch → eine Seite Klartext aus den Arbeitspaketen</div>
+        <p>Der Bericht entsteht aus dem, was im Projekt wirklich steht – nicht aus Folien, die jemand am Freitagabend baut. Überfällige Pakete fallen auf, bevor der Lenkungskreis fragt.</p>
+        <div class="tag">Gleicher Grundsatz: KI fasst zusammen, der Mensch bewertet</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KRAKEN & DATEN ============ -->
+<section id="kraken">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Hub &amp; Datenplattform</div>
+      <h2>KRAKEN steuert, die Daten tragen</h2>
+      <p>Jeder Stern hängt an demselben Kern: KRAKEN gibt den Takt vor, führt die Statusmodelle, schreibt nach Regeln und protokolliert. Was die Agenten brauchen, liefert die Datenplattform.</p>
+    </div>
+    <div class="grid">
+      <div class="card live">
+        <div class="top"><div class="name">KRAKEN als Dirigent</div></div>
+        <div class="route">Cron-Takt → Trigger erkennen → Agent fragen → Antwort prüfen → schreiben → Notiz → Tagesticket 08:45 als Herzschlag</div>
+        <p>Dieselbe Pipeline, die HR-System, Verzeichnisdienst, Mail, Servicedesk, Fernwartung und ERP verbindet und den Mitarbeiter-Austritt nahezu vollständig automatisiert, bedient auch die KI-Agenten. <b>Ein neuer Stern ist ein neues Modul, kein neues System.</b></p>
+        <div class="tag base">Dry-Run als Standard · manuell gewinnt immer · nichts wird gelöscht</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Tageslagebild in Klartext</div></div>
+        <div class="route">Daily Report (Befunde aller Module) → KI fasst zusammen → drei Sätze für das IT-Team, einer für die Geschäftsführung</div>
+        <p>Das Tagesticket bleibt die Wahrheit; die KI liefert die Lesehilfe dazu – und meldet, wenn ein Modul still geworden ist.</p>
+        <div class="tag">Gleiche Leitplanken: nur Zusammenfassung, keine Aktion</div>
+      </div>
+      <div class="card live">
+        <div class="top"><div class="name">OneLake-Export</div></div>
+        <div class="route">Projektzeiten aus SAP ByD → KRAKEN → Microsoft Fabric OneLake, dreimal täglich</div>
+        <p>Der erste Datenstrom in die Plattform, auf der Auswertungen und KI-Fragen aufsetzen – weitere folgen demselben Muster.</p>
+        <div class="tag base">Ein Muster für jeden weiteren Datenstrom</div>
+      </div>
+      <div class="card goal">
+        <div class="top"><div class="name">Fragen in Klartext</div></div>
+        <div class="route">„Welche Projekte liegen über Plan?" → Agent auf den Fabric-Daten → Antwort mit Zahlen und Quelle</div>
+        <p>Auslastung, Termine, Kosten – gefragt statt gesucht. Die Antwort nennt immer die Tabelle, aus der sie stammt.</p>
+        <div class="tag">Jede Antwort nennt ihre Quelle</div>
+      </div>
+      <div class="card live">
+        <div class="top"><div class="name">KI als Engineering-Partner</div></div>
+        <div class="route">KI-Assistent in der Entwicklung → Module, Playbooks, Tests, versionierte Agentenanweisungen</div>
+        <p>Jedes Modul auf dieser Karte ist mit KI gebaut und dokumentiert: versionierte Agentenanweisungen, Testläufe gegen Attrappen mit über hundert Prüfungen je Schnittstelle, Playbooks für Betrieb und Fehlersuche. Die IT baut schneller, als sie wächst.</p>
+        <div class="tag base">Gilt für jeden neuen Stern</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATENFLÜSSE ============ -->
+<section id="daten">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Datenschutz</div>
+      <h2>Was an die KI geht – und was nicht</h2>
+      <p>Jeder Stern bekommt genau die Daten, die er braucht, und läuft im eigenen Tenant. Die Tabelle ist die Grundlage für die Abstimmung mit dem Datenschutzbeauftragten.</p>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Stern</th><th>Eingabe an die KI</th><th>Bleibt draußen</th><th>Dienst</th></tr></thead>
+        <tbody>
+          <tr><td>Firmenrecherche</td><td>Nur <b>https://&lt;domain&gt;</b></td><td>Personen, Mailadressen, Betreffzeilen, Mailinhalte</td><td>Foundry-Agent mit Websuche, Tenant EU</td></tr>
+          <tr><td>Kontaktrecherche</td><td>Name, Firma, Website; die Mailadresse nur als Suchbegriff</td><td>Telefonnummern, Mailinhalte; Datenhändler als Quelle</td><td>Foundry-Agent mit Websuche, Tenant EU</td></tr>
+          <tr><td>Signaturleser</td><td>Die Mail des Absenders (Text und Signaturbilder)</td><td>Mails mit Label „Privat" / „Vertraulich" (werden nie kopiert); Nachrichten Dritter im Verlauf</td><td>Foundry-Agent <b>ohne</b> Websuche</td></tr>
+          <tr><td>Antwortentwurf Servicedesk</td><td>Neues IT-Ticket plus bis zu fünf gelöste Referenztickets aus demselben Bereich</td><td>HR- und QM-Tickets, Passwörter, Secrets</td><td>Azure OpenAI im Tenant</td></tr>
+          <tr><td>Meeting-Zusammenfassung</td><td>Transkript des Kundentermins nach Einwilligung</td><td>Interne und private Termine; Termine ohne Einwilligung</td><td>Azure OpenAI im Tenant</td></tr>
+          <tr><td>Belegerkennung</td><td>Belegbild oder PDF</td><td>Alles außerhalb des Belegs; keine Buchung ohne Freigabe</td><td>Azure Document Intelligence im Tenant</td></tr>
+          <tr><td>Vertragserkennung</td><td>Das Vertragsdokument (PDF oder Scan)</td><td>Arbeits- und Personalverträge (HR bleibt getrennt); Mails mit Label „Privat" / „Vertraulich"</td><td>Azure Document Intelligence + Foundry-Agent im Tenant</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ENTSCHEIDUNGEN ============ -->
+<section id="entscheidungen">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Voraussetzungen</div>
+      <h2>Fünf Voraussetzungen, ohne die kein Stern leuchtet</h2>
+      <p>Technik ist der kleinere Teil. Diese fünf Dinge machen aus einem Agenten einen Betrieb.</p>
+    </div>
+    <div class="decisions">
+      <div class="dec"><h3>Der Fachbereich ist Owner</h3><p>Vertrieb, Servicedesk, Finanzbuchhaltung und Projektleitung geben Regeln und Freigabegrenzen vor; die IT baut Erkennung, Abgleich und Schreibweg. <b>Kein Stern ohne Fachbereich.</b></p></div>
+      <div class="dec"><h3>Pilot vor Fläche</h3><p>Jeder Stern startet mit dem Team, das ihn nutzt, und wird dort gemessen – übernommene Vorschläge, gelöste Fälle, gesparte Minuten. Erst dann leuchtet er für alle.</p></div>
+      <div class="dec"><h3>Datenschutz vor dem ersten Byte</h3><p>Einwilligung, Datenschutzbeauftragter und Mitarbeitervertretung sind Teil jeder Strecke, die Personen betrifft – von der Mailsignatur bis zum Transkript. <b>Bevor</b> die erste Mail gelesen oder der erste Termin aufgezeichnet wird.</p></div>
+      <div class="dec"><h3>Budget mit Deckel</h3><p>Foundry, Azure OpenAI, AI Search, Document Intelligence: ein Deckel je Dienst mit Alarm, damit Kosten je Recherche, Ticket und Beleg sichtbar bleiben.</p></div>
+      <div class="dec"><h3>Ein Hub, kein Zoo</h3><p>Jeder neue Stern ist ein Modul im selben Kern – mit denselben Regeln für Dry-Run, Schreiben und Protokoll. Keine neue Plattform, kein neues Werkzeug je Idee.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <b>Nordstern KI</b> · IT &amp; Organisation<br>
+    KRAKEN, RADAR, Mission Control und contractSAFE sind interne Namen für Automatisierungskern, CRM, Projektplattform und Vertragsarchiv. Alle KI-Dienste laufen im eigenen Microsoft-Tenant; Agenten liefern strukturierte Antworten, Menschen entscheiden.
+  </div>
+</footer>
+
+</body>
+</html>
